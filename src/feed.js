@@ -1,10 +1,11 @@
-
 const loading = document.querySelector('.Id0Rh');
 
+// TODO 클래스 내부에서 id로 분기되어 있는 if문들 로직통합 - 예외로직만 남기는 방향으로
 const Timeline = function(param = {}) {
   const _feed = document.querySelector(param.selector);
   const _url = param.url;
   const _template = param.template;
+  // TODO 내부로직 하드코딩 수동분기를 위한 플래그 - 이런 게 존재하는 건 바람직하지 않음
   const _id = param.id; 
   let _totalPage = 1;
   let _page = 0;
@@ -24,6 +25,7 @@ const Timeline = function(param = {}) {
   const initScroll = async () => {
     const data = await getFeedInfoData();
     _totalPage = data.totalPage;
+    // TODO 페이지가 1보다 클 때만 이벤트 붙이기
     addEvent();
   } 
  
@@ -39,6 +41,7 @@ const Timeline = function(param = {}) {
       return data; 
   }
 
+  // TODO getView, getImageList, getMoreFeedData -> getMoreData 하나로 통합
   const getView = async (id) => {
     if (id === 'timeline') { 
       return await getImageList();
@@ -54,6 +57,7 @@ const Timeline = function(param = {}) {
     const res = await fetch(_url + (_page + 1));
     _page++;
     const { data } = await res.json();
+    // TODO 조건분기 통합하고, 아래 라인만 예외로직으로 빼는 방향으로 리팩토링
     return data.map((l) => l.reduce((o, v, i) => ((o[`src${i + 1}`] = v), o), {}));
   }
 
@@ -105,6 +109,8 @@ const Timeline = function(param = {}) {
   };
 };
 
+// TODO 전역으로 꼭 빼야할 것만 판단하여, 이외엔 특정모듈 내부로 이동 (신규모듈 생성)
+
 const timlineObj = {
     id: 'timeline',
     selector: '#app',
@@ -136,15 +142,19 @@ const switchTab = async function(e) {
 
   timeline.destroy();
 
+  // TODO this.parentNode.children 사용 - 만약 크로스 브라우징을 고려한거라면, 무시하고 아래 TODO로 이동
   const tab = this.parentNode.childNodes; //  a 태그 감싸고 있는 부모
   
   // 탭 컬러 체인지
   tab.forEach((tabList) => {
+    // TODO tabList.nodeType === 1 사용 - children 사용했으면 조건 빼도 됨
     if (tabList.childNodes.length === 1) {
+      // TODO 변수명이 반대로 되어있음 - tab이 tabList이고, tabList가 tab
       tabList.className = '_9VEo1';
       tabList.childNodes[0].className =  tabList.childNodes[0].className.replace('blue', 'grey');
     }
 
+    // FIXME 반복문 밖으로 이동
     this.className = '_9VEo1 T-jvg';
     this.childNodes[0].className =  this.childNodes[0].className.replace('grey', 'blue');
   });
