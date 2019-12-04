@@ -18,6 +18,8 @@ const Common = function() {
         });
         return html;
       };
+      
+    // FIXME 이 아래에 있는 메소드들을 공통으로 뺀 설계의도가 무엇인가요?
 
     const renderDescription = function(description, template) {
         description.innerHTML += template;
@@ -47,13 +49,17 @@ const Common = function() {
 
 // detail 페이지
 const detail = (() => {
+    // FIXME 공통모듈을 인스턴스화 해서 사용하는 목적이 무엇인가요?
     const  common = new Common();
     const _url = 'https://my-json-server.typicode.com/it-crafts/mockapi/detail/';    
     let _slider;
     let _description;
     
+    // FIXME 각 컴포넌트간 종속성이 있습니다 - 생성순서 관계없이 동작할 수 있도록 영향범위 제거 해주세요
     const _create = async () => {
+        // TODO 필요한 데이터만 정제해서 내려주세요 - 컴포넌트 내부로직 개발시 getData 테스트가 반드시 필요한 상태로 결합도가 높습니다
         const data = await common.getData(_url, 1);
+        // FIXME destroy 가능하도록 해주세요
         DetailImage({ data: data });
         _slider = new DetailSlider({ selector: '#slider', data:data });
         _description = new DetailDescription({ data: data });
@@ -107,13 +113,14 @@ const DetailSlider = function(param = {}) {
             rightBtn.removeEventListener('click', slideClick);
         }
     
-        // XXX e.path[1].id 가 아닌 다른방법으로 할 수 있는 방법이 궁금합니다.
         const slideClick = function(e) {
+            // FIXME target === currentTarget인 케이스에만 작동합니다 - 아래 감시절 걷어내세요
             if (e.path[1].id.length <= 0) { return; }
 
             leftBtn.style.display = '';
             rightBtn.style.display = '';                             
             pagebar.children[page - 1].classList.remove('XCodT');
+            // FIXME this만 잡아도 무리없이 동작하는 것 같습니다 - event.path를 사용한 의도가 무엇인가요?
             e.path[1].id === 'right' ? page++ : page--;                        
             wrapper.style.transform = 'translateX(' + (-page + 1) * width +  'px)';            
             pagebar.children[page - 1].classList.add('XCodT') ;
@@ -161,6 +168,7 @@ const DetailDescription = function(param = {}) {
     const template =`<article class="QBXjJ M9sTE h0YNM SgTZ1 Tgarh ">
     <img style="width: 100%; height: auto;" data-src="https://raw.githubusercontent.com/it-crafts/mockapi/master{{ img1 }}"></article>`;
     let page = 1;
+    // FIXME 컴포넌트 외부 뷰를 초기화하고 있습니다 - 슬라이더의 뷰에 접근하지 않도록 해주세요
     viewParent.innerHTML += common.render(detailList, template);
     
     detailImages[page].innerHTML = detailImages[page].innerHTML.replace('data-src', 'src');
@@ -177,15 +185,15 @@ const DetailDescription = function(param = {}) {
         window.removeEventListener('scroll', handler);
     }
 
+    // FIXME 쓰로틀링 넣어서 이미지가 단계적으로 로드될 수 있도록 해주세요
     const handler = () => {
         if (pageYOffset + document.body.offsetHeight < document.body.scrollHeight * 0.9) {
             return;
         }
 
-        // XXX 마지막 페이지 에서 이벤트 제거했는데 오류가 발생합니다.              
+        // FIXME 조건 자체가 정상적으로 발생하지 않는 예외케이스로 걸려 있습니다 - index >= length인 케이스는 없습니다
         if (page >= detailImages.length) {
             removeEvent();
-            return;
         }
         page++;  
         detailImages[page].innerHTML = detailImages[page].innerHTML.replace('data-src', 'src');

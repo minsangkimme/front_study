@@ -38,7 +38,6 @@ const Timeline = function(param = {}) {
       return data; 
   }
 
-  // XXX 수정완료
   // TODO getView, getImageList, getMoreFeedData -> getMoreData 하나로 통합 
   const getMoreData = async () => {
     const res = await fetch(_url + (_page + 1));
@@ -92,7 +91,6 @@ const Timeline = function(param = {}) {
   };
 };
 
-// XXX 수정완료
 // TODO 전역으로 꼭 빼야할 것만 판단하여, 이외엔 특정모듈 내부로 이동 (신규모듈 생성)
 const root = (function() {
   const timlineObj = {
@@ -124,7 +122,7 @@ const root = (function() {
 
     timeline.destroy();
 
-    // XXX childNodes 가 크로스 브라우징을 고려해서 작성했다고 말하는 이유가 뭔가요 ? children 은 크로스 브라우징 고려를 하지 않은건가요?
+    // TODO API별 브라우저 지원범위 확인 - children, childNodes
     // TODO this.parentNode.children 사용 - 만약 크로스 브라우징을 고려한거라면, 무시하고 아래 TODO로 이동
     const tabList = this.parentNode.children; //  a 태그 감싸고 있는 부모
     
